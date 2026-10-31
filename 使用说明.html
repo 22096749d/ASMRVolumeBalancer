@@ -1,0 +1,51 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>轻声 2.1 · 使用说明</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f7f8;color:#203342;font:16px/1.85 "Microsoft YaHei UI","Microsoft YaHei",sans-serif}main{max-width:980px;margin:40px auto;padding:0 28px 60px}.hero{background:#117979;color:white;padding:32px 38px;border-radius:18px}.hero h1{font-size:36px;margin:0 0 5px}.hero p{margin:0;color:#ddf6ef}.card{margin-top:22px;background:white;padding:24px 32px;border:1px solid #e0e9eb;border-radius:14px}h2{font-size:22px;margin:0 0 14px}h3{font-size:17px;margin:20px 0 6px}p{margin:10px 0}li{margin:8px 0}b,strong{color:#117979}.hero strong{color:white}code{font-family:Consolas,monospace;background:#edf5f4;border-radius:4px;padding:2px 6px;color:#224b50}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border-bottom:1px solid #e0e9eb;text-align:left;padding:12px;vertical-align:top}th{background:#edf5f4}a{color:#117979}.muted{color:#647782;font-size:14px}.note{border-left:4px solid #117979;padding:10px 16px;background:#edf7f5;margin:18px 0}
+</style>
+<main><div class="hero"><h1>轻声 2.1</h1><p>ASMR 音量均衡 · 三种模式 × 三档力度</p><p>按主播的声音特点选择参考，让轻语、口腔音和触发音更均衡。</p></div>
+<section class="card"><h2>选择适合这位主播的模式</h2>
+<table><thead><tr><th>模式</th><th>适合什么情况</th><th>怎样设置参考</th></tr></thead><tbody>
+<tr><td><strong>1. 削弱口腔音</strong><br>与轻语平衡</td><td>轻语较小，口腔音、舔耳或其他突发声偏大。采用较快的压低响应。</td><td>选纯轻语片段，点击“测量轻语参考”。把偏大的声音压向该基准。</td></tr>
+<tr><td><strong>2. 削弱轻语</strong><br>与触发音平衡</td><td>轻语持续偏大，而刷麦、敲击等触发音较小。采用较平滑的持续声压低响应。</td><td>选较小触发音的片段，点击“测量触发音参考”。把偏大的声音压向该基准。</td></tr>
+<tr><td><strong>3. 自动平衡</strong><br>削强补弱</td><td>希望整段的强弱声音都更均匀。根据有效声音分布估计中间水平，降低强声并有限度提高弱声。</td><td>通常保留“每个文件自动估计参考”。也可以测量希望作为目标水平的代表片段。</td></tr>
+</tbody></table>
+<div class="note"><strong>三种模式都可独立选择温和、标准、较强。</strong>模式 1、2 是按参考音量和时间响应工作，不会语义识别或分离每一种声音；同时重叠的声音会一起调整。自动参考不准确时，请测量对应的参考片段。</div>
+<p>三个模式分别记住各自的手动参考和自动估计开关。切换模式不会改变你选择的平衡力度；整体增益也单独调节。</p></section>
+<section class="card"><h2>三档力度与整体增益</h2><table><thead><tr><th>力度</th><th>模式 1 / 2</th><th>自动模式</th></tr></thead><tbody>
+<tr><td>温和</td><td>较少压缩，保留更多自然起伏。</td><td>较慢地平衡片段，弱声的局部补偿最多约 +3 dB。</td></tr>
+<tr><td>标准</td><td>明显缩小大声与参考声的差距。</td><td>弱声的局部补偿最多约 +7 dB。推荐作为试听起点。</td></tr>
+<tr><td>较强</td><td>让大声更接近参考声，起伏和细节可能减少。</td><td>较快、更明显地平衡，弱声的局部补偿最多约 +12 dB。</td></tr>
+</tbody></table><p><strong>整体增益支持 -12 到 +12 dB，默认 0 dB。</strong>它在平衡后统一改变整段音量。想助眠时更轻，可以用 -3 或 -6 dB；觉得整段仍太小，可以适当提高。上面的局部补偿上限不包括这项额外的整体增益。</p>
+<p>自动模式有与目标音量联动的瞬间峰值保护、弱声补偿上限和接近静音的门槛，减少对停顿底噪的放大；它无法可靠判断一段微弱声音究竟是触发音还是噪声，请用真实片段试听。</p></section>
+<section class="card"><h2>从打开程序到完成处理</h2><ol>
+<li>完整解压安装包，双击带耳机图标的 <code>ASMRVolumeBalancer.exe</code>。如果使用小更新包，请覆盖原来的程序目录，复用已有 <code>bin</code> 文件夹。</li>
+<li>点击“添加 MP4”多选文件，或直接拖入；“添加文件夹”只读取该文件夹这一层。</li>
+<li>选择模式和力度，先保留整体增益 0 dB。模式 1、2 建议先测量参考。</li>
+<li>选中一个文件，填写试听起点，例如 <code>01:56:46</code>，或直接填秒数。试听长度支持 10–300 秒，填 300 就是 5 分钟；建议包含大小声变化。点击“生成 A/B 试听”。</li>
+<li>在相同耳机音量下切换“播放原音”和“播放处理后”。原音与处理后共享同一进度，切换时从当前位置继续；拖动进度条可定位。“暂停”保留位置，“停止”回到开头。修改模式、参考或力度后，需要重新生成试听。</li>
+<li>满意后点击“开始批量处理”。输出目录留空时，在每个原文件旁创建 <code>ASMR_均衡输出</code>。原文件保留。</li></ol>
+<p>数字文件的峰值并不等于耳机实际声压，初次试听先降低播放音量。右上角可创建桌面快捷方式；程序文件夹移动后需重新创建。</p></section>
+<section class="card"><h2>五分钟试听与可拖动进度条</h2><ol>
+<li>把“长度 / 秒”填成 <strong>300</strong>，生成最长 5 分钟试听。若原文件剩余不足 5 分钟，会按实际剩余长度生成。</li>
+<li>点击“播放原音”或“播放处理后”。下方显示<strong>当前位置 / 总时长</strong>，例如 <code>02:00 / 05:00</code>。</li>
+<li><strong>左右拖动进度条</strong>定位。播放中拖动会暂时暂停，松开后继续；暂停时拖动会保持暂停，方便反复对比同一个位置。</li>
+<li>切换 A/B 按钮会从同一位置播放。也可先暂停、拖回几秒，再选择 A 或 B 反复听同一段。</li>
+<li>“暂停 / 播放继续”控制当前版本；“停止”回到开头。播放结束后再次点击播放，也从开头开始。</li>
+</ol><p>进度条表示生成的试听片段内的位置，不是整个原视频的位置。例如原视频起点 <code>01:56:46</code>，进度条 <code>02:00</code> 对应原视频约 <code>01:58:46</code>。进度条获得焦点后，方向键按秒定位，空格切换暂停 / 继续。</p>
+<p>选择的试听长度会记住。改变模式、力度、参考、起点或长度会使旧试听失效，需要重新生成。退出或重新生成前会释放旧播放文件并清理临时试听。</p>
+</section><section class="card"><h2>准确测量参考</h2><p>把试听起点移到<strong>希望保留的那类声音</strong>，点击对应的测量按钮。程序会读取起点后最多 20 秒，避开很长的停顿，并取有效声音的代表音量。模式 1 选正常轻语；模式 2 选较小的触发音；自动模式可以选你希望作为目标的声音。</p>
+<p>测量后自动取消“每个文件自动估计参考”，改为使用手动参考。随后把试听起点移回轻语和触发音交替的地方，再生成 A/B 试听。</p><p><strong>手动参考用于当前模式下的整个队列。</strong>不同主播或不同录播录制音量差异很大时，分开处理或重新勾选每个文件自动估计。自动估计只统计强弱，不能保证较弱部分一定是轻语或触发音。</p>
+<p>手动参考的数值越负，目标越安静。模式 1、2 若压得过多，可把数值向 0 方向调几 dB；自动模式若抬得太多，先降低力度或整体增益。</p></section>
+<section class="card"><h2>输出、停止与兼容性</h2><ul>
+<li>结果名称带模式和力度，例如 <code>原名_音量均衡_模式2_标准.mp4</code>。同名时加序号；再次开始会重新处理列表中的所有文件。</li>
+<li>视频码流直接复制；音频编码为 AAC 256 kbps，保留原始采样率和单 / 双声道。左右耳使用相同增益，保留原来的方向比例。</li>
+<li>支持 MP4 / M4V。多音轨仅输出处理后的第一条音轨；首条视频、标准 MP4 字幕、章节和元数据尝试保留。不兼容会报告失败。</li>
+<li>长录播流式处理，所需时间与 CPU、硬盘和视频时长有关。请为新文件预留足够空间；结尾重新封装时可能暂时停留在接近 100%。</li>
+<li>先校验输出时长、声道、采样率和视频，再保存最终文件。停止时已完成结果保留，当前未完成临时文件清理。</li>
+<li>Windows 10 / 11 64 位，.NET Framework 4.8。所需音频组件已包含，无须 Python、GPU 或模型。</li>
+<li>设置与日志位于 <code>%LOCALAPPDATA%\ASMRVolumeBalancer</code>，2.0 使用 <code>settings-v2.xml</code>。程序不访问网络。</li></ul>
+<p>失败时双击失败行或点击“查看日志”。原录播本身已有的破音、背景噪声和多种声音的混合，不能仅靠音量平衡恢复或分离。</p></section>
+<section class="card"><h2>2.1 验证与升级</h2><p>2.1 新增 300 秒试听、共享 A/B 时间线、拖动定位、暂停继续与时间显示。已验证实际 300 秒 WAV 文件、相同样本数、拖动状态、A/B 切换保持位置、播放结束与长度设置保存。Windows 本机音频设备调用仍需实机试听确认。</p><p>已验证九种组合的实际音频输出：模式 1、2 不做弱声动态抬升，模式 3 实际压强补弱，力度增强时差距递减；并验证弱声补偿上限、低于门槛的噪声、双耳比例、试听长度与对齐、负增益、取消清理和设置重启保存。</p>
+<p>合成样例原约 23.9 dB 的强弱差距，在模式 3 的温和 / 标准 / 较强档分别约为 11.1 / 7.2 / 2.0 dB，弱声分别提高约 2.9 / 7.0 / 11.1 dB。这些数字来自合成样例，不保证真实 ASMR 会得到相同结果。</p>
+<p>应用严格引用微软 .NET Framework 4.8 接口构建，保留 1.0.1 的兼容性修复。界面和处理验证在 Linux + Mono / FFmpeg 中执行；真实 Windows 录播仍请先试听。</p>
+<p class="muted">源码和重建脚本在 source 文件夹；FFmpeg 原始许可证与构建说明在 licenses 文件夹。</p></section></main></html>

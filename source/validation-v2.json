@@ -1,0 +1,97 @@
+{
+  "original_gap": 23.92108481126233,
+  "matrix": {
+    "1-0": {
+      "quiet_dbfs": -37.47089380463416,
+      "loud_dbfs": -30.850425600911514,
+      "gap_db": 6.620468203722645,
+      "quiet_gain_db": -1.2256510688206461,
+      "loud_gain_db": -18.52626767636033,
+      "ear_ratio_change_db": -0.00023605897177958468,
+      "sample_delay": 0
+    },
+    "1-1": {
+      "quiet_dbfs": -40.224241191715834,
+      "loud_dbfs": -37.23777388618473,
+      "gap_db": 2.9864673055311,
+      "quiet_gain_db": -3.978998455902321,
+      "loud_gain_db": -24.91361596163355,
+      "ear_ratio_change_db": -0.0005090096583302284,
+      "sample_delay": 0
+    },
+    "1-2": {
+      "quiet_dbfs": -41.69757290336741,
+      "loud_dbfs": -40.206936204878865,
+      "gap_db": 1.4906366984885437,
+      "quiet_gain_db": -5.452330167553896,
+      "loud_gain_db": -27.88277828032768,
+      "ear_ratio_change_db": -0.00046150666232591675,
+      "sample_delay": 0
+    },
+    "2-0": {
+      "quiet_dbfs": -36.58995659878658,
+      "loud_dbfs": -28.273124529659512,
+      "gap_db": 8.316832069127067,
+      "quiet_gain_db": -0.34471386297306594,
+      "loud_gain_db": -15.948966605108328,
+      "ear_ratio_change_db": -7.95915081468479e-05,
+      "sample_delay": 0
+    },
+    "2-1": {
+      "quiet_dbfs": -38.662368831068775,
+      "loud_dbfs": -35.67412755880484,
+      "gap_db": 2.9882412722639344,
+      "quiet_gain_db": -2.417126095255263,
+      "loud_gain_db": -23.349969634253657,
+      "ear_ratio_change_db": -0.00021223943770110054,
+      "sample_delay": 0
+    },
+    "2-2": {
+      "quiet_dbfs": -40.06450873020726,
+      "loud_dbfs": -38.57143417887269,
+      "gap_db": 1.4930745513345656,
+      "quiet_gain_db": -3.8192659943937457,
+      "loud_gain_db": -26.24727625432151,
+      "ear_ratio_change_db": -0.0002609571697860247,
+      "sample_delay": 0
+    },
+    "3-0": {
+      "quiet_dbfs": -33.30726531957514,
+      "loud_dbfs": -22.1772983602083,
+      "gap_db": 11.129966959366836,
+      "quiet_gain_db": 2.9379774162383754,
+      "loud_gain_db": -9.853140435657117,
+      "ear_ratio_change_db": 0.00022874738075273626,
+      "sample_delay": 0
+    },
+    "3-1": {
+      "quiet_dbfs": -29.274207355931615,
+      "loud_dbfs": -22.05226167217157,
+      "gap_db": 7.221945683760044,
+      "quiet_gain_db": 6.971035379881897,
+      "loud_gain_db": -9.728103747620388,
+      "ear_ratio_change_db": -3.169856258722348e-05,
+      "sample_delay": 0
+    },
+    "3-2": {
+      "quiet_dbfs": -25.15006461368502,
+      "loud_dbfs": -23.10160944733905,
+      "gap_db": 2.0484551663459705,
+      "quiet_gain_db": 11.095178122128491,
+      "loud_gain_db": -10.777451522787867,
+      "ear_ratio_change_db": -2.0278300734588584e-05,
+      "sample_delay": 0
+    }
+  },
+  "noise_gain": 0.022858966972080452,
+  "offset_lag": 0,
+  "click_peaks": [
+    -19.999469871546843,
+    -21.999515337009644,
+    -23.99798801075626
+  ],
+  "very_quiet_peak": -55.04043882793561,
+  "environment": "Linux + Mono + FFmpeg; application compiled against Microsoft .NET Framework 4.8 references",
+  "semantics": "Reference/envelope policies; no sound classifier or source separation",
+  "ui_regression": "Three modes, three strengths, per-mode references, timestamp parsing, all-mode preview, queue and settings restart passed"
+}

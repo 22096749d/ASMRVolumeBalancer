@@ -1,0 +1,21 @@
+FFmpeg / FFprobe (unmodified standalone Windows executables)
+Version: 9.0.2-essentials_build-www.gyan.dev
+Provider: Gyan Doshi, https://www.gyan.dev/ffmpeg/builds/
+Upstream: https://ffmpeg.org/
+License: GNU General Public License version 3, as identified by the provider.
+Original license: ffmpeg-LICENSE
+Original build details and external-library versions: ffmpeg-README.txt
+FFmpeg source commit provided in the original build README:
+https://github.com/FFmpeg/FFmpeg/commit/946fcce07b
+Provider's build support/source information:
+https://github.com/GyanD/codexffmpeg
+
+Downloaded archive:
+https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-9.0.2-essentials_build.zip
+Archive SHA-256 verified against the provider's .sha256 file:
+60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba
+
+The original FFmpeg license and build README are reproduced unchanged.
+FFmpeg and FFprobe are invoked as external processes, not linked into the
+application. Their copyrights and the rights in their dependencies remain
+with their respective authors.

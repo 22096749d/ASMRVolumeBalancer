@@ -1,0 +1,13 @@
+bin/
+*.exe
+*.pdb
+*.zip
+*.mp4
+*.m4v
+*.wav
+*.flv
+*.partial.*
+logs/
+previews/
+.vs/
+obj/

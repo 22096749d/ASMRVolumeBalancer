@@ -1,0 +1,15 @@
+{
+  "version": "2.1",
+  "framework_target": "Microsoft .NET Framework 4.8 reference assemblies",
+  "preview_limit_seconds": 300,
+  "real_audio_validation": {
+    "sample_rate": 48000,
+    "channels": 2,
+    "duration_ms_A": 300000,
+    "duration_ms_B": 300000,
+    "equal_sample_count": true
+  },
+  "playback_controller": "Seek, pause/resume, A/B same-position switching, natural completion, clamping, stop and unload passed with a deterministic audio device reading real PCM WAV files",
+  "ui": "Five-minute generation, slider bounds and clock, playing/paused drag, A/B position, pause/resume, settings persistence and minimum-size layout passed under Mono/Xvfb",
+  "native_windows_audio": "MCI calls compiled and reviewed against Microsoft documentation; not executed on physical Windows audio hardware"
+}
