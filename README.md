@@ -37,3 +37,9 @@ Windows 本地 ASMR 音量均衡工具，当前版本 **2.1**。支持批量处�
 ## 许可证
 
 应用源码采用 MIT 许可证，见 [LICENSE](LICENSE)。独立运行的 FFmpeg 属于第三方软件，适用其自身许可证；原始许可及构建信息保留在 `licenses/`。
+
+## 下载程序
+
+[下载 Windows v2.1 程序包](../../raw/refs/heads/main/dist/ASMRVolumeBalancer_v2.1_App.zip)
+
+程序包包含可双击运行的 EXE，**不含 FFmpeg**。已有用户解压覆盖原目录并保留 `bin` 文件夹；全新安装请将 Windows x64 的 `ffmpeg.exe` 和 `ffprobe.exe` 放入程序旁的 `bin` 文件夹。下载入口见下方构建说明。
