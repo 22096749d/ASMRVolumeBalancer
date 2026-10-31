@@ -1,0 +1,18 @@
+{
+  "version": "2.1.1",
+  "target": "Microsoft .NET Framework 4.8 reference assemblies",
+  "change": "Replace MCI string-based WAV playback with memory-buffered WinMM waveOut. No filename enters the native audio API.",
+  "regression_checks": 24,
+  "regression_coverage": [
+    "Unicode and >260-character paths",
+    "Native struct layout sizes: WAVEFORMATEX=18, WAVEHDR=48 on x64/32 on x86, MMTIME=12",
+    "Actual unmanaged PCM frames for A/B same-position switching and seeks",
+    "Pause/resume, replay, natural completion, stop and repeated unload",
+    "Device clock fallback formats",
+    "Open/prepare/write/restart errors and safe cleanup retry",
+    "44.1k mono sample alignment",
+    "300-second real 48k stereo PCM file"
+  ],
+  "ui": "End-to-end Mono/Xvfb suite passed twice: once with the prior controller fake and once with the production WaveOutPreviewAudioDevice plus an injected WinMM contract simulator. Includes all three preview modes, 300-second clips, A/B position, seek, pause/resume, batch output and settings.",
+  "native_windows_audio": "Not executed on physical Windows audio hardware; regression device is a simulator. Native Windows P/Invoke calls require Windows listening verification."
+}

@@ -17,8 +17,8 @@ using System.Xml;
 [assembly: AssemblyDescription("保留双耳空间感的本地批量音量均衡工具")]
 [assembly: AssemblyCompany("ASMR Volume Balancer")]
 [assembly: AssemblyProduct("ASMR Volume Balancer")]
-[assembly: AssemblyVersion("2.1.0.0")]
-[assembly: AssemblyFileVersion("2.1.0.0")]
+[assembly: AssemblyVersion("2.1.1.0")]
+[assembly: AssemblyFileVersion("2.1.1.0")]
 [assembly: TargetFramework(".NETFramework,Version=v4.8", FrameworkDisplayName = ".NET Framework 4.8")]
 
 namespace ASMRVolumeBalancer
@@ -102,8 +102,8 @@ namespace ASMRVolumeBalancer
             Directory.CreateDirectory(logFolder); Directory.CreateDirectory(previewFolder);
             logFile = Path.Combine(logFolder, "session_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt");
             engine = new AudioEngine(Path.Combine(appFolder, "bin", "ffmpeg.exe"), Path.Combine(appFolder, "bin", "ffprobe.exe"), Log);
-            playback = new PreviewPlayback(new MciPreviewAudioDevice());
-            Text = "轻声 · ASMR 音量均衡 2.1";
+            playback = new PreviewPlayback(new WaveOutPreviewAudioDevice());
+            Text = "轻声 · ASMR 音量均衡 2.1.1";
             Font = new Font("Microsoft YaHei UI", 9.5F);
             ForeColor = ink; BackColor = Color.FromArgb(244, 248, 249);
             ClientSize = new Size(1140, 900); MinimumSize = new Size(1060, 850);
@@ -125,7 +125,7 @@ namespace ASMRVolumeBalancer
                     MessageBox.Show(this, "未找到 bin 文件夹中的音频组件。\r\n请把整个 ZIP 解压到一个文件夹，再双击 ASMRVolumeBalancer.exe。", "请完整解压", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
-            Log("轻声 ASMR 音量均衡 2.1 启动。仅本地读写，不连接网络。");
+            Log("轻声 ASMR 音量均衡 2.1.1 启动。试听使用直接 PCM / waveOut 播放。仅本地读写，不连接网络。");
         }
 
         Label MakeLabel(string text, int width, int height = 26)
@@ -645,7 +645,7 @@ namespace ASMRVolumeBalancer
             SetBusy(true, "正在准备 A/B 试听…");
             CancellationToken token = cancellation.Token;
             string prefix = Guid.NewGuid().ToString("N");
-            string before = Path.Combine(previewFolder, prefix + "_原音.wav"), after = Path.Combine(previewFolder, prefix + "_处理后.wav");
+            string before = Path.Combine(previewFolder, prefix + "_a.wav"), after = Path.Combine(previewFolder, prefix + "_b.wav");
             try
             {
                 double reference = await Task.Run(delegate

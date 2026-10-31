@@ -72,69 +72,219 @@ namespace ASMRVolumeBalancer
         bool IsPlaying { get; }
     }
 
-    // Windows' built-in waveform-audio device streams the generated PCM WAV.
-    // Seeking does not copy or regenerate a five-minute clip.
-    public sealed class MciPreviewAudioDevice : IPreviewAudioDevice
+    [StructLayout(LayoutKind.Sequential, Pack = 2)]
+    internal struct WaveFormat
     {
-        readonly string alias = "asmr_" + Guid.NewGuid().ToString("N");
-        bool opened;
-        [DllImport("winmm.dll", EntryPoint = "mciSendStringW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        static extern uint SendString(string command, StringBuilder result, uint size, IntPtr callback);
-        [DllImport("winmm.dll", EntryPoint = "mciGetErrorStringW", CharSet = CharSet.Unicode, ExactSpelling = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ErrorString(uint error, StringBuilder text, uint size);
+        public ushort FormatTag, Channels;
+        public uint SamplesPerSecond, AverageBytesPerSecond;
+        public ushort BlockAlign, BitsPerSample, ExtraSize;
+    }
 
-        string Command(string command, bool response = false)
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct WaveHeader
+    {
+        public IntPtr Data;
+        public uint BufferLength, BytesRecorded;
+        public UIntPtr User;
+        public uint Flags, Loops;
+        public IntPtr Next;
+        public UIntPtr Reserved;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 12)]
+    internal struct WaveTime
+    {
+        [FieldOffset(0)] public uint Type;
+        [FieldOffset(4)] public uint Value;
+    }
+
+    // Small seam for regression tests of the real PCM reader, native buffers and
+    // device state machine. Production always uses the WinMM implementation below.
+    internal interface IWaveOutApi
+    {
+        uint Open(out IntPtr device, ref WaveFormat format);
+        uint Close(IntPtr device);
+        uint Prepare(IntPtr device, IntPtr header, uint size);
+        uint Unprepare(IntPtr device, IntPtr header, uint size);
+        uint Write(IntPtr device, IntPtr header, uint size);
+        uint Reset(IntPtr device);
+        uint Pause(IntPtr device);
+        uint Restart(IntPtr device);
+        uint Position(IntPtr device, ref WaveTime time, uint size);
+        string ErrorText(uint error);
+    }
+
+    internal sealed class WinMmWaveOutApi : IWaveOutApi
+    {
+        [DllImport("winmm.dll", ExactSpelling = true)]
+        static extern uint waveOutOpen(out IntPtr device, uint deviceId, ref WaveFormat format, UIntPtr callback, UIntPtr instance, uint flags);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutClose(IntPtr device);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutPrepareHeader(IntPtr device, IntPtr header, uint size);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutUnprepareHeader(IntPtr device, IntPtr header, uint size);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutWrite(IntPtr device, IntPtr header, uint size);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutReset(IntPtr device);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutPause(IntPtr device);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutRestart(IntPtr device);
+        [DllImport("winmm.dll", ExactSpelling = true)] static extern uint waveOutGetPosition(IntPtr device, ref WaveTime time, uint size);
+        [DllImport("winmm.dll", EntryPoint = "waveOutGetErrorTextW", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        static extern uint waveOutGetErrorText(uint error, StringBuilder text, uint size);
+
+        public uint Open(out IntPtr device, ref WaveFormat format) { return waveOutOpen(out device, uint.MaxValue, ref format, UIntPtr.Zero, UIntPtr.Zero, 0); }
+        public uint Close(IntPtr device) { return waveOutClose(device); }
+        public uint Prepare(IntPtr device, IntPtr header, uint size) { return waveOutPrepareHeader(device, header, size); }
+        public uint Unprepare(IntPtr device, IntPtr header, uint size) { return waveOutUnprepareHeader(device, header, size); }
+        public uint Write(IntPtr device, IntPtr header, uint size) { return waveOutWrite(device, header, size); }
+        public uint Reset(IntPtr device) { return waveOutReset(device); }
+        public uint Pause(IntPtr device) { return waveOutPause(device); }
+        public uint Restart(IntPtr device) { return waveOutRestart(device); }
+        public uint Position(IntPtr device, ref WaveTime time, uint size) { return waveOutGetPosition(device, ref time, size); }
+        public string ErrorText(uint error)
         {
-            StringBuilder result = response ? new StringBuilder(256) : null;
-            uint error = SendString(command, result, response ? 256U : 0U, IntPtr.Zero);
-            if (error != 0)
-            {
-                StringBuilder message = new StringBuilder(512);
-                ErrorString(error, message, 512);
-                throw new IOException("无法播放试听：" + (message.Length > 0 ? message.ToString() : "Windows 音频错误 " + error) +
-                    "\r\n请确认耳机或扬声器已连接，并在 Windows 中选好了输出设备。");
-            }
-            return result == null ? "" : result.ToString().Trim();
+            StringBuilder text = new StringBuilder(512);
+            return waveOutGetErrorText(error, text, 512) == 0 ? text.ToString() : "Windows 音频设备错误";
         }
+    }
+
+    // Read Unicode/long paths using .NET, then send PCM memory to Windows. No
+    // filename or MCI command string is passed to the audio driver (no 8.3 names).
+    // Only the selected A/B file is held in memory: about 55 MiB for 5 min/48k/stereo.
+    public sealed class WaveOutPreviewAudioDevice : IPreviewAudioDevice
+    {
+        readonly IWaveOutApi api;
+        readonly uint headerSize = (uint)Marshal.SizeOf(typeof(WaveHeader));
+        IntPtr device, pcm, header;
+        WaveFileInfo info;
+        int offsetBytes;
+        bool prepared, playing;
+
+        public WaveOutPreviewAudioDevice() : this(new WinMmWaveOutApi()) { }
+        internal WaveOutPreviewAudioDevice(IWaveOutApi audioApi) { api = audioApi; }
+
+        void Check(uint error, string operation)
+        {
+            if (error == 0) return;
+            throw new IOException("试听播放失败（" + operation + "，代码 " + error.ToString(CultureInfo.InvariantCulture) + "）：" + api.ErrorText(error) +
+                "\r\n请在 Windows 中确认默认输出设备可用；若仍失败，请通过“查看日志”保留完整错误。");
+        }
+        WaveHeader ReadHeader() { return (WaveHeader)Marshal.PtrToStructure(header, typeof(WaveHeader)); }
+
         public void Open(string path)
         {
             Close();
-            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
-                throw new PlatformNotSupportedException("这个试听播放器需要 Windows；生成和音频处理模块可单独测试。");
-            if (!File.Exists(path) || path.IndexOf('"') >= 0) throw new IOException("找不到试听音频，请重新生成。");
+            if (api is WinMmWaveOutApi && Environment.OSVersion.Platform != PlatformID.Win32NT)
+                throw new PlatformNotSupportedException("这个试听播放器需要 Windows。");
+            WaveFileInfo fileInfo = WaveFileInfo.Read(path);
+            if (fileInfo.DataLength > int.MaxValue)
+                throw new IOException("试听音频过大，请缩短试听长度。");
             try
             {
-                Command("open \"" + path + "\" type waveaudio alias " + alias + " wait"); opened = true;
-                Command("set " + alias + " time format milliseconds");
+                info = fileInfo;
+                pcm = Marshal.AllocHGlobal((int)info.DataLength);
+                header = Marshal.AllocHGlobal((int)headerSize);
+                using (FileStream stream = File.OpenRead(path))
+                {
+                    stream.Position = info.DataOffset;
+                    byte[] block = new byte[65536]; int copied = 0;
+                    while (copied < info.DataLength)
+                    {
+                        int count = stream.Read(block, 0, (int)Math.Min(block.Length, info.DataLength - copied));
+                        if (count == 0) throw new IOException("试听音频未完整读取，请重新生成试听。");
+                        Marshal.Copy(block, 0, IntPtr.Add(pcm, copied), count); copied += count;
+                    }
+                }
+                WaveFormat format = new WaveFormat { FormatTag = 1, Channels = (ushort)info.Channels,
+                    SamplesPerSecond = (uint)info.SampleRate, AverageBytesPerSecond = (uint)(info.SampleRate * info.BlockAlign),
+                    BlockAlign = (ushort)info.BlockAlign, BitsPerSample = 16, ExtraSize = 0 };
+                IntPtr opened;
+                uint error = api.Open(out opened, ref format);
+                if (error == 0) device = opened;
+                Check(error, "打开输出设备");
+                if (device == IntPtr.Zero) throw new IOException("Windows 未返回有效的试听输出设备。");
             }
-            catch { Close(); throw; }
+            catch { try { Close(); } catch { } throw; }
+        }
+
+        void ReleaseBuffer()
+        {
+            if (device == IntPtr.Zero) return;
+            // Reset synchronously returns queued buffers before unprepare/free.
+            Check(api.Reset(device), "停止输出"); playing = false;
+            if (prepared)
+            {
+                Check(api.Unprepare(device, header, headerSize), "释放播放缓冲区");
+                prepared = false;
+            }
         }
         public void Close()
         {
-            if (!opened) return;
-            try { Command("close " + alias + " wait"); } catch (IOException) { } finally { opened = false; }
+            if (device != IntPtr.Zero)
+            {
+                // If a driver fails to return a buffer, retain its memory rather
+                // than freeing memory the driver might still be reading.
+                ReleaseBuffer(); Check(api.Close(device), "关闭输出设备"); device = IntPtr.Zero;
+            }
+            if (header != IntPtr.Zero) { Marshal.FreeHGlobal(header); header = IntPtr.Zero; }
+            if (pcm != IntPtr.Zero) { Marshal.FreeHGlobal(pcm); pcm = IntPtr.Zero; }
+            info = null; offsetBytes = 0; prepared = playing = false;
         }
-        public void Seek(int milliseconds) { if (opened) Command("seek " + alias + " to " + Math.Max(0, milliseconds).ToString(CultureInfo.InvariantCulture) + " wait"); }
+        public void Seek(int milliseconds)
+        {
+            if (info == null) return;
+            ReleaseBuffer();
+            int target = Math.Max(0, Math.Min(info.DurationMilliseconds, milliseconds));
+            offsetBytes = target >= info.DurationMilliseconds ? (int)info.DataLength :
+                (int)Math.Min(info.DataLength, ((long)target * info.SampleRate / 1000) * info.BlockAlign);
+        }
         public void PlayFrom(int milliseconds)
         {
-            if (!opened) throw new InvalidOperationException("请先生成试听。");
-            Seek(milliseconds); Command("play " + alias);
+            if (device == IntPtr.Zero) throw new InvalidOperationException("请先生成试听。");
+            Seek(milliseconds);
+            if (offsetBytes >= info.DataLength) return;
+            WaveHeader buffer = new WaveHeader { Data = IntPtr.Add(pcm, offsetBytes), BufferLength = (uint)(info.DataLength - offsetBytes) };
+            Marshal.StructureToPtr(buffer, header, false);
+            Check(api.Prepare(device, header, headerSize), "准备播放缓冲区"); prepared = true;
+            try
+            {
+                Check(api.Write(device, header, headerSize), "提交音频");
+                // Reset does not guarantee clearing a device's paused state.
+                Check(api.Restart(device), "开始播放"); playing = true;
+            }
+            catch { try { ReleaseBuffer(); } catch { } throw; }
         }
-        public void Pause() { if (opened) Command("pause " + alias); }
-        public void Stop() { if (opened) Command("stop " + alias); }
+        public void Pause()
+        {
+            if (device == IntPtr.Zero || !playing) return;
+            Check(api.Pause(device), "暂停播放"); playing = false;
+        }
+        public void Stop() { Seek(0); }
         public int PositionMilliseconds
         {
             get
             {
-                if (!opened) return 0;
-                int value;
-                if (!int.TryParse(Command("status " + alias + " position", true), NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
-                    throw new IOException("无法读取试听播放位置。");
-                return value;
+                if (info == null) return 0;
+                if (prepared && (ReadHeader().Flags & 1) != 0) return info.DurationMilliseconds;
+                long bytes = offsetBytes;
+                if (prepared)
+                {
+                    WaveTime time = new WaveTime { Type = 4 }; // TIME_BYTES
+                    Check(api.Position(device, ref time, (uint)Marshal.SizeOf(typeof(WaveTime))), "读取播放进度");
+                    if (time.Type == 4) bytes += time.Value;
+                    else if (time.Type == 2) bytes += (long)time.Value * info.BlockAlign; // TIME_SAMPLES
+                    else if (time.Type == 1) bytes += (long)time.Value * info.SampleRate * info.BlockAlign / 1000; // TIME_MS
+                    else throw new IOException("音频设备未返回受支持的播放进度格式。");
+                }
+                long bytesPerSecond = (long)info.SampleRate * info.BlockAlign;
+                return (int)Math.Min(info.DurationMilliseconds, (Math.Max(0, bytes) * 1000 + bytesPerSecond / 2) / bytesPerSecond);
             }
         }
-        public bool IsPlaying { get { return opened && Command("status " + alias + " mode", true).Equals("playing", StringComparison.OrdinalIgnoreCase); } }
+        public bool IsPlaying
+        {
+            get
+            {
+                if (playing && prepared && (ReadHeader().Flags & 1) != 0) playing = false;
+                return playing;
+            }
+        }
         public void Dispose() { Close(); }
     }
 

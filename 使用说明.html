@@ -1,8 +1,8 @@
-<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>轻声 2.1 · 使用说明</title>
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>轻声 2.1.1 · 使用说明</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f7f8;color:#203342;font:16px/1.85 "Microsoft YaHei UI","Microsoft YaHei",sans-serif}main{max-width:980px;margin:40px auto;padding:0 28px 60px}.hero{background:#117979;color:white;padding:32px 38px;border-radius:18px}.hero h1{font-size:36px;margin:0 0 5px}.hero p{margin:0;color:#ddf6ef}.card{margin-top:22px;background:white;padding:24px 32px;border:1px solid #e0e9eb;border-radius:14px}h2{font-size:22px;margin:0 0 14px}h3{font-size:17px;margin:20px 0 6px}p{margin:10px 0}li{margin:8px 0}b,strong{color:#117979}.hero strong{color:white}code{font-family:Consolas,monospace;background:#edf5f4;border-radius:4px;padding:2px 6px;color:#224b50}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border-bottom:1px solid #e0e9eb;text-align:left;padding:12px;vertical-align:top}th{background:#edf5f4}a{color:#117979}.muted{color:#647782;font-size:14px}.note{border-left:4px solid #117979;padding:10px 16px;background:#edf7f5;margin:18px 0}
 </style>
-<main><div class="hero"><h1>轻声 2.1</h1><p>ASMR 音量均衡 · 三种模式 × 三档力度</p><p>按主播的声音特点选择参考，让轻语、口腔音和触发音更均衡。</p></div>
+<main><div class="hero"><h1>轻声 2.1.1</h1><p>ASMR 音量均衡 · 三种模式 × 三档力度</p><p>按主播的声音特点选择参考，让轻语、口腔音和触发音更均衡。</p></div>
 <section class="card"><h2>选择适合这位主播的模式</h2>
 <table><thead><tr><th>模式</th><th>适合什么情况</th><th>怎样设置参考</th></tr></thead><tbody>
 <tr><td><strong>1. 削弱口腔音</strong><br>与轻语平衡</td><td>轻语较小，口腔音、舔耳或其他突发声偏大。采用较快的压低响应。</td><td>选纯轻语片段，点击“测量轻语参考”。把偏大的声音压向该基准。</td></tr>
@@ -45,7 +45,7 @@
 <li>Windows 10 / 11 64 位，.NET Framework 4.8。所需音频组件已包含，无须 Python、GPU 或模型。</li>
 <li>设置与日志位于 <code>%LOCALAPPDATA%\ASMRVolumeBalancer</code>，2.0 使用 <code>settings-v2.xml</code>。程序不访问网络。</li></ul>
 <p>失败时双击失败行或点击“查看日志”。原录播本身已有的破音、背景噪声和多种声音的混合，不能仅靠音量平衡恢复或分离。</p></section>
-<section class="card"><h2>2.1 验证与升级</h2><p>2.1 新增 300 秒试听、共享 A/B 时间线、拖动定位、暂停继续与时间显示。已验证实际 300 秒 WAV 文件、相同样本数、拖动状态、A/B 切换保持位置、播放结束与长度设置保存。Windows 本机音频设备调用仍需实机试听确认。</p><p>已验证九种组合的实际音频输出：模式 1、2 不做弱声动态抬升，模式 3 实际压强补弱，力度增强时差距递减；并验证弱声补偿上限、低于门槛的噪声、双耳比例、试听长度与对齐、负增益、取消清理和设置重启保存。</p>
+<section class="card"><h2>2.1.1 验证与升级</h2><p>2.1.1 新增 300 秒试听、共享 A/B 时间线、拖动定位、暂停继续与时间显示。已验证实际 300 秒 WAV 文件、相同样本数、拖动状态、A/B 切换保持位置、播放结束与长度设置保存。Windows 本机音频设备调用仍需实机试听确认。</p><p>已验证九种组合的实际音频输出：模式 1、2 不做弱声动态抬升，模式 3 实际压强补弱，力度增强时差距递减；并验证弱声补偿上限、低于门槛的噪声、双耳比例、试听长度与对齐、负增益、取消清理和设置重启保存。</p>
 <p>合成样例原约 23.9 dB 的强弱差距，在模式 3 的温和 / 标准 / 较强档分别约为 11.1 / 7.2 / 2.0 dB，弱声分别提高约 2.9 / 7.0 / 11.1 dB。这些数字来自合成样例，不保证真实 ASMR 会得到相同结果。</p>
 <p>应用严格引用微软 .NET Framework 4.8 接口构建，保留 1.0.1 的兼容性修复。界面和处理验证在 Linux + Mono / FFmpeg 中执行；真实 Windows 录播仍请先试听。</p>
 <p class="muted">源码和重建脚本在 source 文件夹；FFmpeg 原始许可证与构建说明在 licenses 文件夹。</p></section></main></html>

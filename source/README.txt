@@ -1,4 +1,4 @@
-ASMR Volume Balancer 2.1 source
+ASMR Volume Balancer 2.1.1 source
 ================================
 
 Program.cs: Windows Forms UI, mode-specific references, queue and A/B playback.
@@ -38,14 +38,22 @@ Automatic mode also ties the lookahead peak ceiling to target RMS plus 16/14/12 
 crest allowance. Very low ceilings use reversible scaling around the limiter so
 its native minimum limit does not silently disable reference-linked peak control.
 
-2.1 playback implementation:
-PreviewPlayer.cs adds a validated RIFF/WAVE PCM reader, shared A/B timeline
-controller, and Windows MCI waveform-audio device (winmm.dll Unicode APIs).
-Native playback streams the existing preview; seeking does not regenerate
-or copy five-minute WAV files. Backend is loaded only when playback starts.
-The controller uses audio-device positions, not a stopwatch approximation.
-Preview generation pads/trims both variants to equal sample counts and
-uses a continuous sample-based preview clock; batch video muxing is unchanged.
-Source build.cmd includes PreviewPlayer.cs. No new third-party runtime is required.
-Validation-v21.json distinguishes real audio-file/UI tests from mock audio
-device tests; native Windows MCI calls have not run in this Linux environment.
+2.1.1 playback implementation (fixes the 2.1 MCI filename error):
+PreviewPlayer.cs validates RIFF/WAVE PCM and reads it using managed Unicode/long-path
+file I/O. WinMM waveOut receives only PCM buffers, never filenames or MCI commands.
+WAVEFORMATEX, WAVEHDR and MMTIME have explicit native-compatible layouts.
+One selected A/B WAV is buffered at a time (about 55 MiB for 300 sec/48k/stereo).
+Seeking resets and unprepares the old header before submitting a block-aligned view
+of the same PCM allocation. No re-rendering is required. Buffer memory remains valid
+until the audio device releases it. Pause, resume and driver error paths are covered.
+The shared timeline still uses the hardware-reported clock; TIME_BYTES, TIME_SAMPLES
+and TIME_MS are supported. A/B variants preserve the shared millisecond position.
+Temporary preview filenames are ASCII; parent directories can contain Unicode.
+No new third-party runtime or player is required. Existing FFmpeg binaries are reused.
+
+source/tests/WaveOutTests.cs: 24 focused regression checks with an injected WinMM
+contract simulator that reads the real unmanaged PCM buffer. Includes Chinese/long
+paths, 44.1k mono, 48k stereo, 300-second real WAV, repeated A/B/seek and cleanup errors.
+The end-to-end UI suite passes under Mono/Xvfb; audio generation/muxing is unchanged.
+Validation-v211.json records the verification boundary: no physical Windows sound
+hardware was available. A mock driver is not a substitute for a Windows listening test.

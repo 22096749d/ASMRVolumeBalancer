@@ -1,6 +1,12 @@
 # 轻声 · ASMR Volume Balancer
 
-Windows 本地 ASMR 音量均衡工具，当前版本 **2.1**。支持批量处理 MP4，并保留左右耳方向感。
+Windows 本地 ASMR 音量均衡工具，当前版本 **2.1.1**。支持批量处理 MP4，并保留左右耳方向感。
+
+## 2.1.1 试听播放修复
+
+修复 2.1 播放试听时报“文件名无效 / 未超过 8 个字符”的兼容问题。已替换旧 MCI 播放后端，直接把 PCM 音频送入 Windows 输出设备，不再通过音频命令解析文件名。更新后请重新生成 A/B 试听；三种模式、三档力度、最长五分钟试听和共享进度条均保留。
+
+[下载 2.1.1 更新包](https://github.com/22096749d/ASMRVolumeBalancer/raw/refs/heads/main/dist/ASMRVolumeBalancer_Update_v2.1.1.zip)（退出旧程序后覆盖原程序目录，保留 `bin`）
 
 ## 功能
 
@@ -32,7 +38,7 @@ Windows 本地 ASMR 音量均衡工具，当前版本 **2.1**。支持批量处�
 
 本工具按音量统计、参考片段和时间响应工作，**不进行语义识别或声音分离**；同时重叠的声音会一起调整。自动模式设有补偿上限及峰值保护，真实录播仍需试听调节。
 
-应用严格针对微软 .NET Framework 4.8 接口编译。音频及界面验证在 Linux/Mono 中执行；播放控制逻辑使用测试音频设备验证，Windows 原生播放设备仍需实机试听。验证摘要位于 `source/validation-v2.json` 与 `source/validation-v21.json`。
+应用严格针对微软 .NET Framework 4.8 接口编译。音频及界面验证在 Linux/Mono 中执行；播放控制逻辑使用测试音频设备验证，2.1.1 另外使用实际 PCM 缓冲区验证了中文长路径、同位置切换、定位、暂停/继续、五分钟片段及错误清理，并完成生产播放后端的界面回归。测试使用模拟 WinMM 驱动，Windows 原生设备仍需实机试听。验证摘要见 `source/validation-v211.json`；可重复运行的播放回归测试见 `source/tests/`。
 
 ## 许可证
 
@@ -40,6 +46,6 @@ Windows 本地 ASMR 音量均衡工具，当前版本 **2.1**。支持批量处�
 
 ## 下载程序
 
-[下载 Windows v2.1 程序包](../../raw/refs/heads/main/dist/ASMRVolumeBalancer_v2.1_App.zip)
+[下载 Windows v2.1.1 程序 / 更新包](https://github.com/22096749d/ASMRVolumeBalancer/raw/refs/heads/main/dist/ASMRVolumeBalancer_Update_v2.1.1.zip)
 
-程序包包含可双击运行的 EXE，**不含 FFmpeg**。已有用户解压覆盖原目录并保留 `bin` 文件夹；全新安装请将 Windows x64 的 `ffmpeg.exe` 和 `ffprobe.exe` 放入程序旁的 `bin` 文件夹。下载入口见下方构建说明。
+程序包包含可双击运行的 EXE，**不含 FFmpeg**。已有用户解压覆盖原目录并保留 `bin` 文件夹；全新安装请将 Windows x64 的 `ffmpeg.exe` 和 `ffprobe.exe` 放入程序旁的 `bin` 文件夹。下载入口见上方构建说明。
